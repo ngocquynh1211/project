@@ -9,15 +9,16 @@ def create_task_management_window():
 
     # set up thông tin cho window
     window.title("Task Management System")
-    window.geometry("430x600")
+    window.geometry("814x650")
     window.config(bg="#535c68")
 
     # Class
     class Task:
-        def __init__(self, name, progress):
+        def __init__(self, name, progress, technician, ID):
             self.name = name
             self.progress = progress
-
+            self.technician = technician
+            self.ID = ID
     # tạo list để lưu trữ tiến độ công việc
     task_list = []
 
@@ -27,8 +28,10 @@ def create_task_management_window():
         # lấy giá trị từ các entry
         name_value = name.get()
         progress_value = int(progress.get())
+        technician_value = technician.get()
+        ID_value = int(ID.get())
 
-        new_task = Task(name_value, progress_value)
+        new_task = Task(name_value, progress_value, technician_value, ID_value)
 
         # thêm vào list
         task_list.append(new_task)
@@ -42,18 +45,20 @@ def create_task_management_window():
         # xóa giá trị ở entry
         name.delete(0, END)
         progress.delete(0, END)
+        technician.delete(0, END)
+        ID.delete(0, END)
 
     def update_task_listbox():
         task_listbox.delete(*task_listbox.get_children())
         for task in task_list:
-            task_listbox.insert('', 'end', values=(task.name, task.progress))
+            task_listbox.insert('', 'end', values=(task.ID, task.name, task.progress, task.technician))
 
     def search_task():
         search_value = search_name.get()
         is_found = False
 
         for task in task_list:
-            if task.name == search_value:
+            if task.name == search_value or str(task.ID) == search_value:
                 messagebox.showinfo("Search Task", f"Name: {task.name}, Progress: {task.progress}%")
                 is_found = True
                 break
@@ -69,7 +74,7 @@ def create_task_management_window():
         is_found = False
 
         for task in task_list:
-            if task.name == delete_value:
+            if task.name == delete_value or str(task.ID) == delete_value:
                 task_list.remove(task)
                 messagebox.showinfo("Delete Task", f"{delete_value} is deleted successfully")
                 is_found = True
@@ -130,6 +135,8 @@ def create_task_management_window():
     def reset():
         name.delete(0, END)
         progress.delete(0, END)
+        technician.delete(0, END)
+        ID.delete(0, END)
         search_name.delete(0, END)
         delete_name.delete(0, END)
         update_name.delete(0, END)
@@ -138,8 +145,11 @@ def create_task_management_window():
 
     # set up các widget
     # tạo label
+    header_label = Label(window, text="Task Management System", bg="#2c3e50", fg="white", font=("Helvetica", 20))
     name_lbl = Label(window, text="Name:", bg="#535c68", fg="white")
     progress_lbl = Label(window, text="Progress(%):", bg="#535c68", fg="white")
+    technician_lbl = Label(window, text="Technician:", bg="#535c68", fg="white")
+    ID_lbl = Label(window, text="ID:", bg="#535c68", fg="white")
     search_lbl = Label(window, text="Search Task:", bg="#535c68", fg="white")
     delete_lbl = Label(window, text="Delete Task:", bg="#535c68", fg="white")
     update_lbl = Label(window, text="Update Task:", bg="#535c68", fg="white")
@@ -148,6 +158,8 @@ def create_task_management_window():
     # tạo entry
     name = Entry(window)
     progress = Entry(window)
+    technician = Entry(window)
+    ID = Entry(window)
     search_name = Entry(window)
     delete_name = Entry(window)
     update_name = Entry(window)
@@ -163,38 +175,50 @@ def create_task_management_window():
     reset_btn = Button(window, text="Reset", command=reset, bg="lightgrey", fg="black")
 
     # tạo listbox
-    task_listbox = ttk.Treeview(window, columns=("Name", "Progress"), show="headings")
+    task_listbox = ttk.Treeview(window, columns=("ID", "Name", "Progress", "Technician"), show="headings", style="Custom.Treeview")
+    task_listbox.heading("ID", text="Task ID")
     task_listbox.heading("Name", text="Task Name")
     task_listbox.heading("Progress", text="Progress")
-    task_listbox.grid(row=3, columnspan=2, padx=5, pady=5)
+    task_listbox.heading("Technician", text="Technician")
+    task_listbox.grid(row=10, column=0, columnspan=4, pady=5, padx=5, sticky="nsew")
+
+    # Custom style for Treeview
+    window.style = ttk.Style()
+    window.style.theme_use("clam")
+    window.style.configure("Custom.Treeview", background="#ecf0f1", fieldbackground="#ecf0f1", foreground="#2c3e50", borderwidth=0, anchor="center")
 
     # dán các widget lên window
-    name_lbl.grid(row=0, column=0, pady=5, padx=5, sticky="w")
-    name.grid(row=0, column=1, pady=5, padx=5, sticky="w")
-    progress_lbl.grid(row=1, column=0, pady=5, padx=5, sticky="w")
-    progress.grid(row=1, column=1, pady=5, padx=5, sticky="w")
-    add_btn.grid(row=2, column=0, pady=5, padx=5, sticky="w")
+    header_label.grid(row=0, column=0, columnspan=4, pady=10, padx=10, sticky="nsew")
+    ID_lbl.grid(row=1, column=0, pady=5, padx=5, sticky="w")
+    ID.grid(row=1, column=1, pady=5, padx=5, sticky="w")
+    name_lbl.grid(row=2, column=0, pady=5, padx=5, sticky="w")
+    name.grid(row=2, column=1, pady=5, padx=5, sticky="w")
+    progress_lbl.grid(row=3, column=0, pady=5, padx=5, sticky="w")
+    progress.grid(row=3, column=1, pady=5, padx=5, sticky="w")
+    technician_lbl.grid(row=4, column=0, pady=5, padx=5, sticky="w")
+    technician.grid(row=4, column=1, pady=5, padx=5, sticky="w")
+    add_btn.grid(row=5, column=0, columnspan=1, pady=5, padx=5, sticky="we")
 
-    search_lbl.grid(row=3, column=0, pady=5, padx=5, sticky="w")
-    search_name.grid(row=3, column=1, pady=5, padx=5, sticky="w")
-    search_btn.grid(row=3, column=2, pady=5, padx=5, sticky="w")
+    search_lbl.grid(row=6, column=0, pady=5, padx=5, sticky="w")
+    search_name.grid(row=6, column=1, pady=5, padx=5, sticky="w")
+    search_btn.grid(row=6, column=2, pady=5, padx=5, sticky="w")
 
-    delete_lbl.grid(row=4, column=0, pady=5, padx=5, sticky="w")
-    delete_name.grid(row=4, column=1, pady=5, padx=5, sticky="w")
-    delete_btn.grid(row=4, column=2, pady=5, padx=5, sticky="w")
+    delete_lbl.grid(row=7, column=0, pady=5, padx=5, sticky="w")
+    delete_name.grid(row=7, column=1, pady=5, padx=5, sticky="w")
+    delete_btn.grid(row=7, column=2, pady=5, padx=5, sticky="w")
 
-    update_lbl.grid(row=5, column=0, pady=5, padx=5, sticky="w")
-    update_name.grid(row=5, column=1, pady=5, padx=5, sticky="w")
-    update_progress.grid(row=5, column=2, pady=5, padx=5, sticky="w")
-    update_btn.grid(row=5, column=3, pady=5, padx=5, sticky="w")
+    update_lbl.grid(row=8, column=0, pady=5, padx=5, sticky="w")
+    update_name.grid(row=8, column=1, pady=5, padx=5, sticky="w")
+    update_progress.grid(row=8, column=2, pady=5, padx=5, sticky="w")
+    update_btn.grid(row=8, column=3, pady=5, padx=5, sticky="w")
 
-    complete_lbl.grid(row=6, column=0, pady=5, padx=5, sticky="w")
-    complete_name.grid(row=6, column=1, pady=5, padx=5, sticky="w")
-    complete_btn.grid(row=6, column=2, pady=5, padx=5, sticky="w")
+    complete_lbl.grid(row=9, column=0, pady=5, padx=5, sticky="w")
+    complete_name.grid(row=9, column=1, pady=5, padx=5, sticky="w")
+    complete_btn.grid(row=9, column=2, columnspan=1, pady=5, padx=5, sticky="w")
 
-    reset_btn.grid(row=7, column=1, pady=5, padx=5, sticky="w")
+    reset_btn.grid(row=10, column=0, columnspan=1, pady=5, padx=5, sticky="we")
 
-    task_listbox.grid(row=8, columnspan=4, pady=5, padx=5)
+    task_listbox.grid(row=11, column=0, columnspan=4, pady=5, padx=5, sticky="nsew")
 
     # chạy ứng dụng
     window.mainloop()
