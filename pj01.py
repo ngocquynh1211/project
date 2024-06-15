@@ -95,7 +95,7 @@ def create_task_management_window():
         is_found = False
 
         for task in task_list:
-            if task.name == update_value:
+            if task.name == update_value or str(task.ID) == update_value:
                 task.progress = new_progress
                 messagebox.showinfo("Update Task", f"{update_value} progress updated to {new_progress}%")
                 is_found = True
